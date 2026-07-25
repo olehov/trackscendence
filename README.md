@@ -251,10 +251,23 @@ To exceed the mandatory 14 points required for evaluation, our project implement
 ### Installation & Configuration
 
 1. **Clone the repository**
+
+   The code is hosted in two places with an identical tree, so every step below is the same whichever one you clone from.
+
+   From GitHub (development):
+
    ```bash
    git clone git@github.com:Trackscendence/trackscendence.git
    cd trackscendence
    ```
+
+   From the 42 Vogsphere (evaluation) — use the SSH URL the intra shows for this project, then enter the folder it creates:
+
+   ```bash
+   git clone git@vogsphere.42london.com:vogsphere/<your-project-repo>
+   cd <your-project-repo>
+   ```
+
 2. **Install dependencies**
    ```bash
    npm run install:all
