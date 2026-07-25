@@ -144,6 +144,67 @@ The platform is orchestrated using Docker Compose, decoupling services into dist
 - **Backend (Server)**: An Express API handling REST endpoints and real-time state synchronization via Socket.IO.
 - **Database**: PostgreSQL database managed through Prisma ORM migrations.
 
+```mermaid
+flowchart TB
+  browser([Browser])
+
+  subgraph compose[Docker Compose network]
+    nginx[Nginx reverse proxy · :8080]
+    client[Client · React + Vite]
+    server[Server · Express + Socket.IO · :3001]
+    db[(PostgreSQL)]
+  end
+
+  mail[[Mailpit / SMTP]]
+  oauth[[42 OAuth]]
+
+  browser --> nginx
+  nginx -->|static assets| client
+  nginx -->|/api/v1 · /websocket| server
+  server --> db
+  server --> mail
+  server --> oauth
+```
+
+### Request Lifecycle
+
+Every REST call flows through the same layered path, so responsibilities stay separated: controllers only read the request, services hold the business logic, and repositories own all Prisma access. Typed exceptions bubble up to a single error handler that converts them into `{ error: { code, message } }`.
+
+```mermaid
+flowchart LR
+  req([HTTP request]) --> app[app.js]
+  app --> routes[routes/v1]
+  routes --> mw[Auth middleware<br/>requireAuth · requireRole]
+  mw --> controller[Controller<br/>parse & validate]
+  controller --> service[Service<br/>business logic]
+  service --> repo[Repository<br/>Prisma queries]
+  repo --> pg[(PostgreSQL)]
+  service -. throws .-> exc[Typed exception]
+  exc --> handler[errorHandler]
+  handler --> res([JSON error response])
+```
+
+### Realtime Game Flow
+
+Live gameplay runs over Socket.IO. On connection the server asks the client for its JWT within a five-second window, then holds each active match in an in-memory store that behaves like an async cache, so it can later be swapped for Redis without touching callers. A finished match is flushed to PostgreSQL once, at game over.
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant WS as Socket.IO layer
+  participant G as In-memory game store
+  participant DB as PostgreSQL
+
+  C->>WS: connect, then send JWT (5s handshake)
+  WS-->>C: authenticated
+  C->>WS: play move
+  WS->>G: apply move to game engine
+  G-->>WS: next game state
+  WS-->>C: broadcast state to seated players
+  Note over G,DB: on game over
+  G->>DB: persist completed game (game.repository)
+```
+
 ### Database Schema
 
 Our database relational schema is defined in Prisma and is automatically kept up-to-date. You can view the live entity-relationship diagram here:
