@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "prepare": "husky",
+    "prepare": "node -e \"if (!process.env.VERCEL) require('child_process').execSync('husky', {stdio: 'inherit'})\"",
     "install:all": "npm install && npm install --prefix server && npm install --prefix client",
     "client:dev": "cross-env VITE_API_PROXY_TARGET=http://localhost:3001 npm run dev --prefix client",
     "server:dev": "npm run dev --prefix server",
