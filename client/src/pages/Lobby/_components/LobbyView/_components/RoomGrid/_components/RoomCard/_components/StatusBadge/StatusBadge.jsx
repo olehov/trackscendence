@@ -1,3 +1,5 @@
+import { useLanguage } from '@/i18n/LanguageContext'
+
 const BADGE_STYLES = {
   open: { colorClasses: 'bg-[#D0FAE5] text-[#007A55]', label: 'Open' },
   waiting: { colorClasses: 'bg-[#E8F4FD] text-[#1565C0]', label: 'Waiting' },
@@ -5,6 +7,7 @@ const BADGE_STYLES = {
 }
 
 const StatusBadge = ({ variant }) => {
+  const { t } = useLanguage()
   const badge = BADGE_STYLES[variant] ?? BADGE_STYLES.open
 
   return (
@@ -15,7 +18,7 @@ const StatusBadge = ({ variant }) => {
         aria-hidden="true"
         className="h-1.5 w-1.5 rounded-full bg-current"
       />
-      {badge.label}
+      {t(badge.label)}
     </span>
   )
 }

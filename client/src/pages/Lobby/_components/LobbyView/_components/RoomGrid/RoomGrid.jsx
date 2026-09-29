@@ -1,10 +1,13 @@
 import RoomCard from './_components/RoomCard'
+import { useLanguage } from '@/i18n/LanguageContext'
 
 const RoomGrid = ({ rooms, onJoinRoom }) => {
+  const { t } = useLanguage()
+
   if (rooms.length === 0) {
     return (
       <p className="max-w-sm pt-10 text-center text-sm font-medium text-[#9A7050] sm:pt-16">
-        No rooms yet. Create one and invite a friend to play.
+        {t('No rooms yet. Create one and invite a friend to play.')}
       </p>
     )
   }

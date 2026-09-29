@@ -1,7 +1,9 @@
 import StatusBadge from './_components/StatusBadge'
 import SeatAvatars from './_components/SeatAvatars'
+import { useLanguage } from '@/i18n/LanguageContext'
 
 const RoomCard = ({ room, onJoin }) => {
+  const { t } = useLanguage()
   const isFull = room.players.length >= room.capacity
   const badgeVariant =
     room.status === 'IN_GAME' ? 'inGame' : isFull ? 'waiting' : 'open'
@@ -15,11 +17,11 @@ const RoomCard = ({ room, onJoin }) => {
         </h2>
         <StatusBadge variant={badgeVariant} />
       </div>
-      <p className="text-xs text-[#9A7050]">by {room.owner.username}</p>
+      <p className="text-xs text-[#9A7050]">{t(`by ${room.owner.username}`)}</p>
       <div className="flex flex-col gap-2">
         <SeatAvatars players={room.players} capacity={room.capacity} />
         <p className="text-xs text-[#9A7050]">
-          {room.players.length} of {room.capacity} players joined
+          {t(`${room.players.length} of ${room.capacity} players joined`)}
         </p>
       </div>
       {isJoinable ? (
@@ -28,7 +30,7 @@ const RoomCard = ({ room, onJoin }) => {
           onClick={onJoin}
           className="w-full rounded-[14px] border border-[#C8956A] py-2 text-sm font-semibold text-[#6A4A20] transition hover:bg-[rgba(200,149,106,0.1)]"
         >
-          Join Room
+          {t('Join Room')}
         </button>
       ) : null}
     </article>
